@@ -33,10 +33,14 @@
     - flush() 메소드는 버퍼에 데이터가 가득 차 있건 아니건, 버퍼에서 강제로 밀어내도록 하는 메소드이다. wirte에 저장된 값을 출력함과 동시에 비워준다.
 
 ### 요구사항 2 - get 방식으로 회원가입
-* 
+- .indexOf(String str) - 특정 문자나 문자열이 앞에서부터 처음 발견되는 인덱스를 반환한다.
+- .substring(int startIndex) - startIndex부터 끝까지의 문자열을 반환한다.
+- .substring(int startIndex, int endIndex) - startIndex부터 endIndex(불포함)까의 문자열을 반환한다.
+- User 객체가 잘 만들어졌는지에 대한 테스트 코드 작성하는 법 알아보기.
 
 ### 요구사항 3 - post 방식으로 회원가입
-* 
+- 로그에 객체 자체를 출력하면 다음과 같이 객체의 속성도 모두 보여준다.
+  - `User [userId=byul, password=1234, name=Byulyi, email=byulcode%40gmail.com]`
 
 ### 요구사항 4 - redirect 방식으로 이동
 * 
