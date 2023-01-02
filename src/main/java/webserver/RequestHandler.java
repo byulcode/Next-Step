@@ -34,6 +34,14 @@ public class RequestHandler extends Thread {
             String[] tokens = line.split(" ");
             String url = tokens[1];
 
+            if (line == null) {
+                return;
+            }
+            while (!"".equals(line)) {
+                line = br.readLine();
+                log.debug("line : {}", line);
+            }
+
             //요구사항2 - GET 방식으로 회원가입하기
             if (url.startsWith("/user/create?")) {
                 int index = url.indexOf("?");
@@ -46,22 +54,13 @@ public class RequestHandler extends Thread {
                 log.debug("password : {}", user.getPassword());
                 log.debug("name : {}", user.getName());
                 log.debug("email : {}", user.getEmail());
+            } else {
+                DataOutputStream dos = new DataOutputStream(out);
+                byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+                response200Header(dos, body.length);
+                responseBody(dos, body);
             }
 
-            if (line == null) {
-                return;
-            }
-            while (!"".equals(line)) {
-                line = br.readLine();
-                log.debug("line : {}", line);
-            }
-
-            String path = URLEncoder.encode("./webapp" + url, "UTF-8");
-
-            DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = Files.readAllBytes(new File(path).toPath());
-            response200Header(dos, body.length);
-            responseBody(dos, body);
         } catch (IOException e) {
             log.error(e.getMessage());
         }
