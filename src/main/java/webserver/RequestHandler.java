@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.net.URLEncoder;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.Map;
 
 import db.DataBase;
@@ -27,7 +28,7 @@ public class RequestHandler extends Thread {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // 요청정보 라인별로 읽기
+            // 요청정보 읽기
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String line = br.readLine();
             log.debug("request : {}", line);
@@ -41,35 +42,34 @@ public class RequestHandler extends Thread {
                 return;
             }
 
-            // Content-Length 값 가져오기
-            int contentLength = 0;
-            while (!"".equals(line)) {
-                line = br.readLine();
-                if (line.contains("Content-Length")) {
-                    String[] content = line.split(":");
-                    contentLength = Integer.parseInt(content[1].trim());
-                }
-                log.debug("line : {}", line);
+            //헤더 정보 가져오기
+            Map<String, String> headerInfo = new HashMap<>();
+            while (!"".equals(line = br.readLine())) {
+                String[] info = line.split(": ");
+                headerInfo.put(info[0], info[1]);
             }
 
             DataOutputStream dos = new DataOutputStream(out);
 
             // 회원가입시 body에 저장된 회원정보 읽기
             if (url.equals("/user/create")) {
-                String body = IOUtils.readData(br, contentLength);
+                String body = IOUtils.readData(br, Integer.parseInt(headerInfo.get("Content-Length")));
+
+                // 읽어온 회원 정보를 담은 user 객체 생성
                 Map<String, String> params = HttpRequestUtils.parseQueryString(body);
-                User user = new User(params.get("userId"), params.get("password"),
-                        params.get("name"), params.get("email"));
+                User user = new User(params.get("userId"), params.get("password"), params.get("name"), params.get("email"));
                 log.debug("User : {}", user);
+
                 //database에 user 저장
                 DataBase.addUser(user);
+                log.debug("Database : {}", DataBase.findUserById(user.getUserId()));
 
                 // /index.html로 리다이렉트
                 response302Header(dos, "/index.html");
 
             }  //로그인시 body에 저장된 로그인정보 읽기
             else if (url.equals("/user/login")) {
-                String body = IOUtils.readData(br, contentLength);
+                String body = IOUtils.readData(br, Integer.parseInt(headerInfo.get("Content-Length")));
                 Map<String, String> params = HttpRequestUtils.parseQueryString(body);
                 User user = DataBase.findUserById(params.get("userId"));
 
