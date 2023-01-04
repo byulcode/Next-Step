@@ -2,7 +2,6 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,14 +36,13 @@ public class RequestHandler extends Thread {
             String[] tokens = line.split(" ");
             String url = tokens[1];
 
-            // null일 경우 예외처리
-            if (line == null) {
-                return;
-            }
-
             //헤더 정보 가져오기
             Map<String, String> headerInfo = new HashMap<>();
             while (!"".equals(line = br.readLine())) {
+                // null일 경우 예외처리
+                if (line == null) {
+                    return;
+                }
                 String[] info = line.split(": ");
                 headerInfo.put(info[0], info[1]);
             }
@@ -77,20 +75,18 @@ public class RequestHandler extends Thread {
                 String cookie = "";
                 //불러온 정보에 해당하는 회원이 없을 경우
                 if (user == null) {
-                    byte[] resBody = Files.readAllBytes(new File("./webapp/user/login_failed.html").toPath());
-                    response200HeaderLoginFalse(dos, resBody.length);
+                    response(dos, "/user/login_failed.html");
                 }
                 // 아이디가 존재할 경우
                 else {
                     if (user.getPassword().equals(params.get("password"))) { //비밀번호가 맞은 경우
                         url = "/index.html";
                         cookie = "logined=true";
+                        response302HeaderWithCookie(dos, url, cookie);
                     } else {//비밀번호가 틀린 경우
-                        byte[] resBody = Files.readAllBytes(new File("./webapp/user/login_failed.html").toPath());
-                        response200HeaderLoginFalse(dos, resBody.length);
+                        response(dos, "/user/login_failed.html");
                     }
                 }
-                response302HeaderWithCookie(dos, url, cookie);
             } else {
                 byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
                 response200Header(dos, body.length);
@@ -115,7 +111,7 @@ public class RequestHandler extends Thread {
     private void response302HeaderWithCookie(DataOutputStream dos, String url, String cookie) {
         try {
             dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
-            dos.writeBytes("Location: /index.html" + "\r\n");
+            dos.writeBytes("Location: " + url + "\r\n");
             dos.writeBytes("Set-Cookie: " + cookie + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
@@ -128,11 +124,17 @@ public class RequestHandler extends Thread {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("Set-Cookie: logined=false");
+            dos.writeBytes("Set-Cookie: logined=false\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    private void response(DataOutputStream dos, String url) throws IOException {
+        byte[] resBody = Files.readAllBytes(new File("./webapp" + url).toPath());
+        response200HeaderLoginFalse(dos, resBody.length);
+        responseBody(dos, resBody);
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
