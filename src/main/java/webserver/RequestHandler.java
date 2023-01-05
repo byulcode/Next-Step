@@ -75,7 +75,6 @@ public class RequestHandler extends Thread {
                 //불러온 정보에 해당하는 회원이 없을 경우
                 if (user == null) {
                     response(dos, "/user/login_failed.html");
-                    return;
                 }
                 // 아이디가 존재할 경우
                 else {
@@ -117,6 +116,9 @@ public class RequestHandler extends Thread {
             }
             else {
                 byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+                if(headerInfo.get("Accept").contains("text/css")){
+                    response200HeaderCss(dos, body.length);
+                }
                 response200Header(dos, body.length);
                 responseBody(dos, body);
             }
