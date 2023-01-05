@@ -43,13 +43,33 @@
   - `User [userId=byul, password=1234, name=Byulyi, email=byulcode%40gmail.com]`
 
 ### 요구사항 4 - redirect 방식으로 이동
-* 
+- [https://en.wikipedia.org/wiki/HTTP_302](https://en.wikipedia.org/wiki/HTTP_302) 를 참고하여 /index.html로 이동하도록 하는 응답 헤더는 다음과 같이 보내면 됨을 알 수 있다.
 
+  > HTTP/1.1 302 FOUND <br>
+  > Location: /index.html
+
+- 상태 코드 : 클라이언트가 보낸 요청의 처리 상태를 응답에서 알려주는 기능
+  - 200 : 클라이언트의 요청을 성공적으로 처리했다
+  - 302 : 일시적인 리다이렉션 코드. 리다이렉트시 요청 메서드가 GET으로 변하고, 본문이 제거될 수 있다.
 ### 요구사항 5 - cookie
-* 
+- HTTP 쿠키
+  - Key와 Value로 이루어진 데이터이다.
+  - 주로 쿠키는 서버ㅔ서 생성하여 Set-Cookie HTTP Response Header에 얺어 클라이언트에 전달하고, 클라이언트에서 직접 쿠키에 데이터를 저장할 수도 있다.
+  - 클라이언트는 이를 저장한 다음에 다시 서버에게 전송함으로써 Stateless 프로토콜 속성을 보완한다.
+- Set-Cookie
+  - Set-Cookie: <cookie-name>=<cookie-value>
+  - 서버는 Set-Cookie 헤더를 설정하여 응답과 함께 전송하고 쿠키는 브라우저에 저장한다.
+- 로그인 실패시 - Forward 방식 사용(Status code : 200)
+  - 로그인 실패시 login_failed.html로 이동하며, 로그인이 되지 않는다. 즉 데이터를 전달할 필요가 없기 때문에 Forward 방식을 사용했다.
+- 로그인 성공 - Redirect 방식 사용(Status code : 302)
+  - 로그인 성공시 user정보를 전달하고 유지해야 되므로 redirect를 사용했다.
+- forward, redirect 방식의 차이가 무엇인지, 언제 무엇을 사용해야 하는지 더 공부해볼 필요가 있다.
+### 요구사항 6 - 사용자 목록 출력
+- StringBuilder를 통해 html 태그를 이용해 동적 html을 구성할 수 있다.
+- 로그인하지 않은 경우 로그인 페이지로 리다이렉트
 
-### 요구사항 6 - stylesheet 적용
-* 
+### 요구사항 7 - CSS 지원하기
+Content-Type이 text/html일 경우 브라우저는 HTML파일로 인식하기 때문에 CSS가 정상적으로 동작하지 않는다. 그러므로 css 파일이 입력되었을 때 Content-Type이 text/css으로 보내도록 코딩한다.
 
 ### heroku 서버에 배포 후
 * 
