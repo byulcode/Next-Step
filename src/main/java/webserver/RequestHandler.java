@@ -3,6 +3,7 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,23 +72,50 @@ public class RequestHandler extends Thread {
                 Map<String, String> params = HttpRequestUtils.parseQueryString(body);
                 User user = DataBase.findUserById(params.get("userId"));
 
-                // 로그인 정보 확인 및 쿠키 설정
-                String cookie = "";
                 //불러온 정보에 해당하는 회원이 없을 경우
                 if (user == null) {
                     response(dos, "/user/login_failed.html");
+                    return;
                 }
                 // 아이디가 존재할 경우
                 else {
                     if (user.getPassword().equals(params.get("password"))) { //비밀번호가 맞은 경우
                         url = "/index.html";
-                        cookie = "logined=true";
-                        response302HeaderWithCookie(dos, url, cookie);
+                        response302HeaderWithCookie(dos, url, "logined=true");
                     } else {//비밀번호가 틀린 경우
-                        response(dos, "/user/login_failed.html");
+                        DataOutputStream dataOutputStream = new DataOutputStream(out);
+                        response(dataOutputStream, "/user/login_failed.html");
                     }
                 }
-            } else {
+            } //사용자 목록 출력
+            else if (url.equals("/user/list")) {
+                String cookie = HttpRequestUtils.parseCookies(headerInfo.get("Cookie")).get("logined");
+
+                if (!Boolean.parseBoolean(cookie)) {//로그인하지 않은 경우
+                    response302HeaderWithCookie(dos, "/user/login.html", "logined=false");
+                    return;
+                }
+                //로그인 한 경우
+                StringBuilder sb = new StringBuilder();
+                Collection<User> users = DataBase.findAll();
+                log.debug("database.user : {}", users);
+                sb.append("<table border=\"1\">");
+                String prefix = "<td>";
+                String postfix = "</td>";
+                for (User user : users) {
+                    sb.append("<tr>");
+                    sb.append(prefix + user.getUserId() + postfix);
+                    sb.append(prefix + user.getName() + postfix);
+                    sb.append(prefix + user.getEmail() + postfix);
+                    sb.append("</tr>");
+                }
+                sb.append("</table>");
+
+                byte[] body = sb.toString().getBytes();
+                response200Header(dos, body.length);
+                responseBody(dos, body);
+            }
+            else {
                 byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
                 response200Header(dos, body.length);
                 responseBody(dos, body);
@@ -135,6 +163,17 @@ public class RequestHandler extends Thread {
         byte[] resBody = Files.readAllBytes(new File("./webapp" + url).toPath());
         response200HeaderLoginFalse(dos, resBody.length);
         responseBody(dos, resBody);
+    }
+
+    private void response200HeaderCss(DataOutputStream dos, int lengthOfBodyContent) {
+        try {
+            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("Content-Type: text/css;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
