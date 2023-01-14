@@ -1,4 +1,5 @@
-GET /user/create?userId=byulycode&password=password&name=Byulyi HTTP/1.1
+GET /user/create?userId=byulcode&password=password&name=Byulyi HTTP/1.1
 Host: localhost:8080
 Connection: keep-alive
 Accept: */*
+

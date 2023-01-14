@@ -5,4 +5,4 @@ Content-Length: 46
 Content-Type: application/x-www-form-urlencoded
 Accept: */*
 
-userId=byulycode&password=password&name=Byulyi
+userId=byulcode&password=password&name=Byulyi
