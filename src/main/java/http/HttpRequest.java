@@ -24,6 +24,7 @@ public class HttpRequest {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             //요청 라인 읽기
             String line = br.readLine();
+            log.debug("request line : {}", line);
 
             //null인 경우 예외처리
             if (line == null) {
