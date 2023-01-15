@@ -34,7 +34,7 @@ public class HttpRequest {
             }
 
             //GET 방식, POST 방식 구분
-            httpMethod(line);
+            processRequestLine(line);
 
             // 헤더 정보 가져오기
             while (!"".equals(line = br.readLine())) {
@@ -53,7 +53,7 @@ public class HttpRequest {
         }
     }
 
-    private void httpMethod(String line) {
+    private void processRequestLine(String line) {
         String[] token = line.split(" ");
         method = token[0];
 
