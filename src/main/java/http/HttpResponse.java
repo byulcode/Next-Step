@@ -1,4 +1,4 @@
-package webserver;
+package http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,12 +36,18 @@ public class HttpResponse {
             } else {
                 headers.put("Content-Type", "text/html;charset=utf-8");
             }
-
+            headers.put("Content-Length", body.length+"");
             response200Header(body.length);
             responseBody(body);
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    public void forwardBody(String body) {
+        byte[] contents = body.getBytes();
+        headers.put("Content-Type", "text/html;charset=utf-8");
+        headers.put("Content-Length", contents.length + "");
     }
 
     public void sendRedirect(String redirectUrl) {
