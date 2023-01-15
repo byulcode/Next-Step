@@ -54,6 +54,7 @@ public class HttpRequest {
     }
 
     private void processRequestLine(String line) {
+        log.debug("request line : {}", line);
         String[] token = line.split(" ");
         method = token[0];
 
@@ -64,17 +65,21 @@ public class HttpRequest {
         }
 
         //GET 방식인 경우 쿼리스트링을 통해 사용자정보 저장
-        String url = token[1];
-        int index = url.indexOf("?");
-        path = url.substring(0, index);
-        String queryString = url.substring(index + 1);
-        parameter = HttpRequestUtils.parseQueryString(queryString);
+        int index = token[1].indexOf("?");
+        if (index == -1) {
+            path = token[1];
+        } else {
+            path = token[1].substring(0, index);
+            parameter = HttpRequestUtils.parseQueryString(token[1].substring(index + 1)); //쿼리스트링
+        }
+
     }
 
     private void saveParameterUseBody(BufferedReader br, int contentLength) throws IOException {
         String body = IOUtils.readData(br, contentLength);
         parameter = HttpRequestUtils.parseQueryString(body);
     }
+
     public String getMethod() {
         return method;
     }
