@@ -27,8 +27,8 @@ public class HttpRequest {
             log.debug("request line : {}", line);
 
             //null인 경우 예외처리
-            if (line == null) {
-                return;
+            if (line == null){
+                throw new IllegalStateException();
             }
 
             //GET 방식, POST 방식 구분
@@ -50,7 +50,7 @@ public class HttpRequest {
                 params = requestLine.getParams();
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error(e.getMessage());
         }
     }
 
