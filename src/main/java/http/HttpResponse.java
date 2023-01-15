@@ -48,13 +48,15 @@ public class HttpResponse {
         byte[] contents = body.getBytes();
         headers.put("Content-Type", "text/html;charset=utf-8");
         headers.put("Content-Length", contents.length + "");
+        response200Header(contents.length);
+        responseBody(contents);
     }
 
     public void sendRedirect(String redirectUrl) {
         try {
             dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
             processHeaders();
-            dos.writeBytes("Location: "+ redirectUrl);
+            dos.writeBytes("Location: "+ redirectUrl + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
