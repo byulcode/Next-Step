@@ -19,6 +19,7 @@ public class HttpRequest {
     private Map<String, String> params = new HashMap<>();
     private RequestLine requestLine;
 
+
     public HttpRequest(InputStream in) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
@@ -68,5 +69,9 @@ public class HttpRequest {
 
     public String getPath() {
         return requestLine.getPath();
+    }
+
+    public HttpCookie getCookies() {
+        return new HttpCookie(getHeader("Cookie"));
     }
 }
