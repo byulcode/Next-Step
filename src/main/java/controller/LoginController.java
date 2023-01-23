@@ -4,6 +4,7 @@ import db.DataBase;
 import http.HttpRequest;
 import http.HttpResponse;
 import model.User;
+import session.HttpSession;
 
 public class LoginController extends AbstractController {
 
@@ -14,7 +15,8 @@ public class LoginController extends AbstractController {
         // 해당 아이디가 존재하는 경우
         if (user != null) {
             if (user.login(request.getParameter("password"))) {//비밀번호 맞을 경우
-                response.addHeader("Set-Cookie", "logined=true");
+                HttpSession session = request.getSession();
+                session.setAttribute("user", user);
                 response.sendRedirect("/index.html");
             } else {// 비밀번호가 틀릴 경우
                 response.sendRedirect("/user/login_failed.html");

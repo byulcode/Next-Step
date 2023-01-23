@@ -6,6 +6,7 @@ import http.HttpResponse;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import session.HttpSession;
 import util.HttpRequestUtils;
 
 import java.util.Collection;
@@ -16,7 +17,7 @@ public class ListUserController extends AbstractController{
 
     @Override
     public void doGet(HttpRequest request, HttpResponse response) {
-        if (!isLogin(request.getHeader("Cookie"))) {//로그인하지 않은 경우
+        if (!isLogin(request.getSession())) {//로그인하지 않은 경우
             response.sendRedirect("/user/login.html");
             return;
         }
@@ -39,12 +40,11 @@ public class ListUserController extends AbstractController{
         response.forwardBody(sb.toString());
     }
 
-    public boolean isLogin(String cookieValue) {
-        Map<String, String> cookies = HttpRequestUtils.parseCookies(cookieValue);
-        String value = cookies.get("logined");
-        if (value == null) {
+    public boolean isLogin(HttpSession session) {
+        Object user = session.getAttribute("user");
+        if (user == null) {
             return false;
         }
-        return Boolean.parseBoolean(value);
+        return true;
     }
 }
