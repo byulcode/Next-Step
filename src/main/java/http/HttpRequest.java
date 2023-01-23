@@ -2,6 +2,8 @@ package http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import session.HttpSession;
+import session.HttpSessions;
 import util.HttpRequestUtils;
 import util.IOUtils;
 
@@ -73,5 +75,9 @@ public class HttpRequest {
 
     public HttpCookie getCookies() {
         return new HttpCookie(getHeader("Cookie"));
+    }
+
+    public HttpSession getSession() {
+        return HttpSessions.getSession(getCookies().getCookie("JSESSIONID"));
     }
 }
