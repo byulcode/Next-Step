@@ -16,14 +16,38 @@ public class UserDao {
         Connection con = null;
         PreparedStatement pstmt = null;
         try {
-            con = ConnectionManager.getConnection();
-            String sql = "INSERT INTO USERS VALUES (?, ?, ?, ?)";
-            pstmt = con.prepareStatement(sql);
-            pstmt.setString(1, user.getUserId());
-            pstmt.setString(2, user.getPassword());
-            pstmt.setString(3, user.getName());
-            pstmt.setString(4, user.getEmail());
+            con = createConnection();
+            pstmt = con.prepareStatement(createQueryForInsert());
+            setValues(user, pstmt);
+        } finally {
+            if (pstmt != null) {
+                pstmt.close();
+            }
 
+            if (con != null) {
+                con.close();
+            }
+        }
+    }
+
+    // 쿼리 결과 저장
+    public void setValues(User user, PreparedStatement pstmt) throws SQLException {
+        pstmt.setString(1, user.getPassword());
+        pstmt.setString(2, user.getName());
+        pstmt.setString(3, user.getEmail());
+        pstmt.setString(4, user.getUserId());
+        pstmt.executeUpdate();
+    }
+
+
+    //회원 update
+    public void update(User user) throws SQLException {
+        Connection con = null;
+        PreparedStatement pstmt = null;
+        try {
+            con = createConnection();
+            pstmt = con.prepareStatement(createQueryForUpdate());
+            setValues(user, pstmt);
             pstmt.executeUpdate();
         } finally {
             if (pstmt != null) {
@@ -36,29 +60,19 @@ public class UserDao {
         }
     }
 
-    //회원 update
-    public void update(User user) throws SQLException {
-        Connection con = null;
-        PreparedStatement pstmt = null;
-        try {
-            con = ConnectionManager.getConnection();
-            String sql = "UPDATE USERS SET password = ?, name= ?, email = ? WHERE userId = ?";//sql문
-            pstmt = con.prepareStatement(sql);
-            pstmt.setString(1, user.getPassword());
-            pstmt.setString(2, user.getName());
-            pstmt.setString(3, user.getEmail());
-            pstmt.setString(4, user.getUserId());
+    //insert 쿼리문
+    public String createQueryForInsert() {
+        return "INSERT INTO USERS VALUES (?, ?, ?, ?)";
+    }
 
-            pstmt.executeUpdate();
-        } finally {
-            if (pstmt != null) {
-                pstmt.close();
-            }
+    //update 쿼리문
+    public String createQueryForUpdate() {
+        return "UPDATE USERS SET password = ?, name= ?, email = ? WHERE userId = ?";
+    }
 
-            if (con != null) {
-                con.close();
-            }
-        }
+    //connection 생성 메소드
+    public Connection createConnection() {
+        return ConnectionManager.getConnection();
     }
 
     //모든 회원 반환
@@ -68,7 +82,7 @@ public class UserDao {
         PreparedStatement pstmt = null;
         ResultSet rs = null; //select 결과를 담을 변수
         try {
-            con = ConnectionManager.getConnection();
+            con = createConnection();
             String sql = "SELECT * FROM USERS";
             pstmt = con.prepareStatement(sql);
 
@@ -100,7 +114,7 @@ public class UserDao {
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         try {
-            con = ConnectionManager.getConnection();
+            con = createConnection();
             String sql = "SELECT userId, password, name, email FROM USERS WHERE userid=?";
             pstmt = con.prepareStatement(sql);
             pstmt.setString(1, userId);
