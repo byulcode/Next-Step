@@ -8,74 +8,53 @@ import java.util.ArrayList;
 import java.util.List;
 
 import core.jdbc.ConnectionManager;
+import core.jdbc.InsertJdbcTemplate;
+import core.jdbc.UpdateJdbcTemplate;
 import next.model.User;
 
 public class UserDao {
     //회원 insert
     public void insert(User user) throws SQLException {
-        Connection con = null;
-        PreparedStatement pstmt = null;
-        try {
-            con = ConnectionManager.getConnection();
-            pstmt = con.prepareStatement(createQueryForInsert());
-            setValuesForInsert(user, pstmt);
-        } finally {
-            if (pstmt != null) {
-                pstmt.close();
+
+        InsertJdbcTemplate insertJdbcTemplate = new InsertJdbcTemplate() {
+            @Override
+            public void setValuesForInsert(User user, PreparedStatement pstmt) throws SQLException {
+                pstmt.setString(1, user.getUserId());
+                pstmt.setString(2, user.getPassword());
+                pstmt.setString(3, user.getName());
+                pstmt.setString(4, user.getEmail());
+                pstmt.executeUpdate();
             }
 
-            if (con != null) {
-                con.close();
+            @Override
+            public String createQueryForInsert() {
+                return "INSERT INTO USERS VALUES (?, ?, ?, ?)";
             }
-        }
-    }
-
-    // 쿼리 결과 저장
-    private void setValuesForInsert(User user, PreparedStatement pstmt) throws SQLException {
-        pstmt.setString(1, user.getUserId());
-        pstmt.setString(2, user.getPassword());
-        pstmt.setString(3, user.getName());
-        pstmt.setString(4, user.getEmail());
-        pstmt.executeUpdate();
-    }
-
-    private void setValuesForUpdate(User user, PreparedStatement pstmt) throws SQLException {
-        pstmt.setString(1, user.getPassword());
-        pstmt.setString(2, user.getName());
-        pstmt.setString(3, user.getEmail());
-        pstmt.setString(4, user.getUserId());
-        pstmt.executeUpdate();
+        };
+        insertJdbcTemplate.insert(user);
     }
 
 
     //회원 update
     public void update(User user) throws SQLException {
-        Connection con = null;
-        PreparedStatement pstmt = null;
-        try {
-            con = ConnectionManager.getConnection();
-            pstmt = con.prepareStatement(createQueryForUpdate());
-            setValuesForUpdate(user, pstmt);
-        } finally {
-            if (pstmt != null) {
-                pstmt.close();
+        UpdateJdbcTemplate updateJdbcTemplate = new UpdateJdbcTemplate() {
+            @Override
+            public void setValuesForUpdate(User user, PreparedStatement pstmt) throws SQLException {
+                pstmt.setString(1, user.getPassword());
+                pstmt.setString(2, user.getName());
+                pstmt.setString(3, user.getEmail());
+                pstmt.setString(4, user.getUserId());
+                pstmt.executeUpdate();
             }
 
-            if (con != null) {
-                con.close();
+            @Override
+            public String createQueryForUpdate() {
+                return "UPDATE USERS SET password = ?, name= ?, email = ? WHERE userId = ?";
             }
-        }
+        };
+        updateJdbcTemplate.update(user);
     }
 
-    //insert 쿼리문
-    private String createQueryForInsert() {
-        return "INSERT INTO USERS VALUES (?, ?, ?, ?)";
-    }
-
-    //update 쿼리문
-    private String createQueryForUpdate() {
-        return "UPDATE USERS SET password = ?, name= ?, email = ? WHERE userId = ?";
-    }
 
     //모든 회원 반환
     public List<User> findAll() throws SQLException {
