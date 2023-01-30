@@ -79,18 +79,17 @@ public class UserDao {
                 pstmt.setString(1, userId);
             }
         };
-        RowMapper rowMapper = new RowMapper() {
+        RowMapper<User> rowMapper = new RowMapper() {
             @Override
-            public Object mapRow(ResultSet rs) throws SQLException {
-                User user = new User
+            public User mapRow(ResultSet rs) throws SQLException {
+                return new User
                         (rs.getString("userId"),
                                 rs.getString("password"),
                                 rs.getString("name"),
                                 rs.getString("email"));
-                return user;
             }
         };
         JdbcTemplate jdbcTemplate = new JdbcTemplate();
-        return (User) jdbcTemplate.queryForObject(sql, pstmtSetter, rowMapper);
+        return jdbcTemplate.queryForObject(sql, pstmtSetter, rowMapper);
     }
 }

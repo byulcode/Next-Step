@@ -19,18 +19,18 @@ public class JdbcTemplate {
         }
     }
 
-    public List query(String sql, PreparedStatementSetter pstmtSetter, RowMapper rowMapper) throws SQLException {
+    public <T> List<T> query(String sql, PreparedStatementSetter pstmtSetter, RowMapper<T> rowMapper) throws SQLException {
         ResultSet rs = null;
         try (Connection con = ConnectionManager.getConnection();
              PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmtSetter.setValues(pstmt);
             rs = pstmt.executeQuery();
 
-            List users = new ArrayList();
+            List<T> list = new ArrayList<>();
             if (rs.next()) {
-                users.add(rowMapper.mapRow(rs));
+                list.add(rowMapper.mapRow(rs));
             }
-            return users;
+            return list;
         } catch (SQLException e) {
             throw new DataAccessException(e);
         } finally {
@@ -41,9 +41,11 @@ public class JdbcTemplate {
     }
 
     //단건을 조회하기 위한 메소드
-    public Object queryForObject(String sql, PreparedStatementSetter pstmtSetter, RowMapper rowMapper) throws SQLException {
-        List result = new ArrayList();
-        result = query(sql, pstmtSetter, rowMapper);
+    public <T> T queryForObject(String sql, PreparedStatementSetter pstmtSetter, RowMapper<T> rowMapper) throws SQLException {
+        List<T> result = query(sql, pstmtSetter, rowMapper);
+        if (result.isEmpty()) {
+            return null;
+        }
         return result.get(0);
     }
 }
