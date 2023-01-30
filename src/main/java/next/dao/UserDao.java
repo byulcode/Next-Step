@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 import core.jdbc.JdbcTemplate;
+import core.jdbc.PreparedStatementSetter;
+import core.jdbc.RowMapper;
 import next.model.User;
 
 public class UserDao {
@@ -13,7 +15,8 @@ public class UserDao {
     public void insert(User user) throws SQLException {
 
         String sql = "INSERT INTO USERS VALUES (?, ?, ?, ?)";
-        JdbcTemplate jdbcTemplate = new JdbcTemplate() {
+
+        PreparedStatementSetter pstmtSetter = new PreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement pstmt) throws SQLException {
                 pstmt.setString(1, user.getUserId());
@@ -22,20 +25,16 @@ public class UserDao {
                 pstmt.setString(4, user.getEmail());
                 pstmt.executeUpdate();
             }
-
-            @Override
-            public Object mapRow(ResultSet rs) throws SQLException {
-                return null;
-            }
         };
-        jdbcTemplate.update(sql);
+        JdbcTemplate jdbcTemplate = new JdbcTemplate();
+        jdbcTemplate.update(sql, pstmtSetter);
     }
 
     //회원 update
     public void update(User user) throws SQLException {
 
         String sql = "UPDATE USERS SET password = ?, name= ?, email = ? WHERE userId = ?";
-        JdbcTemplate jdbcTemplate = new JdbcTemplate() {
+        PreparedStatementSetter pstmtSetter = new PreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement pstmt) throws SQLException {
                 pstmt.setString(1, user.getPassword());
@@ -44,47 +43,43 @@ public class UserDao {
                 pstmt.setString(4, user.getUserId());
                 pstmt.executeUpdate();
             }
-
-            @Override
-            public Object mapRow(ResultSet rs) throws SQLException {
-                return null;
-            }
         };
-        jdbcTemplate.update(sql);
+
+        JdbcTemplate jdbcTemplate = new JdbcTemplate();
+        jdbcTemplate.update(sql, pstmtSetter);
     }
 
     //모든 회원 반환
     public List<User> findAll() throws SQLException {
         String sql = "SELECT * FROM USERS";
-
-        JdbcTemplate jdbcTemplate = new JdbcTemplate() {
+        PreparedStatementSetter pstmtSetter = new PreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement pstmt) throws SQLException {
-
-            }
-
-            @Override
-            public Object mapRow(ResultSet rs) throws SQLException {
-                User user = new User
-                        (rs.getString("userId"),
-                                rs.getString("password"),
-                                rs.getString("name"),
-                                rs.getString("email"));
-                return user;
             }
         };
-        return jdbcTemplate.query(sql);
+        RowMapper rowMapper = rs -> {
+            User user = new User
+                    (rs.getString("userId"),
+                            rs.getString("password"),
+                            rs.getString("name"),
+                            rs.getString("email"));
+            return user;
+        };
+
+        JdbcTemplate jdbcTemplate = new JdbcTemplate();
+        return jdbcTemplate.query(sql, pstmtSetter, rowMapper);
     }
 
     //userId로 회원 찾기
     public User findByUserId(String userId) throws SQLException {
         String sql = "SELECT userId, password, name, email FROM USERS WHERE userid=?";
-        JdbcTemplate jdbcTemplate = new JdbcTemplate() {
+        PreparedStatementSetter pstmtSetter = new PreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement pstmt) throws SQLException {
                 pstmt.setString(1, userId);
             }
-
+        };
+        RowMapper rowMapper = new RowMapper() {
             @Override
             public Object mapRow(ResultSet rs) throws SQLException {
                 User user = new User
@@ -95,6 +90,7 @@ public class UserDao {
                 return user;
             }
         };
-        return (User) jdbcTemplate.queryForObject(sql);
+        JdbcTemplate jdbcTemplate = new JdbcTemplate();
+        return (User) jdbcTemplate.queryForObject(sql, pstmtSetter, rowMapper);
     }
 }

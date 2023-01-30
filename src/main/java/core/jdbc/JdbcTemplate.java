@@ -7,19 +7,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class JdbcTemplate {
-    public abstract void setValues(PreparedStatement pstmt) throws SQLException;
+public class JdbcTemplate {
 
-    //resultSet의 결과 객체로 생성하는 메소드
-    public abstract Object mapRow(ResultSet rs) throws SQLException;
-
-    public void update(String sql) throws SQLException {
+    public void update(String sql, PreparedStatementSetter pstmtSetter) throws SQLException {
         Connection con = null;
         PreparedStatement pstmt = null;
         try {
             con = ConnectionManager.getConnection();
             pstmt = con.prepareStatement(sql);
-            setValues(pstmt);
+            pstmtSetter.setValues(pstmt);
         } finally {
             if (pstmt != null) {
                 pstmt.close();
@@ -30,19 +26,19 @@ public abstract class JdbcTemplate {
         }
     }
 
-    public List query(String sql) throws SQLException {
+    public List query(String sql, PreparedStatementSetter pstmtSetter, RowMapper rowMapper) throws SQLException {
         Connection con = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         try {
             con = ConnectionManager.getConnection();
             pstmt = con.prepareStatement(sql);
-            setValues(pstmt);
+            pstmtSetter.setValues(pstmt);
             rs = pstmt.executeQuery();
 
             List users = new ArrayList();
             if (rs.next()) {
-                users.add(mapRow(rs));
+                users.add(rowMapper.mapRow(rs));
             }
             return users;
         } finally {
@@ -59,9 +55,9 @@ public abstract class JdbcTemplate {
     }
 
     //단건을 조회하기 위한 메소드
-    public Object queryForObject(String sql) throws SQLException {
+    public Object queryForObject(String sql,PreparedStatementSetter pstmtSetter, RowMapper rowMapper) throws SQLException {
         List result = new ArrayList();
-        result = query(sql);
+        result = query(sql, pstmtSetter, rowMapper);
         return result.get(0);
     }
 }
