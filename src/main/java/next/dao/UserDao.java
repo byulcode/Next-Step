@@ -16,47 +16,22 @@ public class UserDao {
 
         String sql = "INSERT INTO USERS VALUES (?, ?, ?, ?)";
 
-        PreparedStatementSetter pstmtSetter = new PreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement pstmt) throws SQLException {
-                pstmt.setString(1, user.getUserId());
-                pstmt.setString(2, user.getPassword());
-                pstmt.setString(3, user.getName());
-                pstmt.setString(4, user.getEmail());
-                pstmt.executeUpdate();
-            }
-        };
         JdbcTemplate jdbcTemplate = new JdbcTemplate();
-        jdbcTemplate.update(sql, pstmtSetter);
+        jdbcTemplate.update(sql, user.getUserId(), user.getPassword(), user.getName(), user.getEmail());
     }
 
     //회원 update
     public void update(User user) throws SQLException {
 
         String sql = "UPDATE USERS SET password = ?, name= ?, email = ? WHERE userId = ?";
-        PreparedStatementSetter pstmtSetter = new PreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement pstmt) throws SQLException {
-                pstmt.setString(1, user.getPassword());
-                pstmt.setString(2, user.getName());
-                pstmt.setString(3, user.getEmail());
-                pstmt.setString(4, user.getUserId());
-                pstmt.executeUpdate();
-            }
-        };
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate();
-        jdbcTemplate.update(sql, pstmtSetter);
+        jdbcTemplate.update(sql, user.getPassword(), user.getName(), user.getEmail(), user.getUserId());
     }
 
     //모든 회원 반환
     public List<User> findAll() throws SQLException {
         String sql = "SELECT * FROM USERS";
-        PreparedStatementSetter pstmtSetter = new PreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement pstmt) throws SQLException {
-            }
-        };
         RowMapper rowMapper = rs -> {
             User user = new User
                     (rs.getString("userId"),
@@ -67,18 +42,12 @@ public class UserDao {
         };
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate();
-        return jdbcTemplate.query(sql, pstmtSetter, rowMapper);
+        return jdbcTemplate.query(sql, rowMapper);
     }
 
     //userId로 회원 찾기
     public User findByUserId(String userId) throws SQLException {
         String sql = "SELECT userId, password, name, email FROM USERS WHERE userid=?";
-        PreparedStatementSetter pstmtSetter = new PreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement pstmt) throws SQLException {
-                pstmt.setString(1, userId);
-            }
-        };
         RowMapper<User> rowMapper = new RowMapper() {
             @Override
             public User mapRow(ResultSet rs) throws SQLException {
@@ -90,6 +59,6 @@ public class UserDao {
             }
         };
         JdbcTemplate jdbcTemplate = new JdbcTemplate();
-        return jdbcTemplate.queryForObject(sql, pstmtSetter, rowMapper);
+        return jdbcTemplate.queryForObject(sql, rowMapper, userId);
     }
 }
