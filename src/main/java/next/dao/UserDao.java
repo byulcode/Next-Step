@@ -1,15 +1,11 @@
 package next.dao;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
-import core.jdbc.ConnectionManager;
 import core.jdbc.JdbcTemplate;
-import core.jdbc.SelectJdbcTemplate;
 import next.model.User;
 
 public class UserDao {
@@ -25,6 +21,11 @@ public class UserDao {
                 pstmt.setString(3, user.getName());
                 pstmt.setString(4, user.getEmail());
                 pstmt.executeUpdate();
+            }
+
+            @Override
+            public Object mapRow(ResultSet rs) throws SQLException {
+                return null;
             }
         };
         jdbcTemplate.update(sql);
@@ -43,6 +44,11 @@ public class UserDao {
                 pstmt.setString(4, user.getUserId());
                 pstmt.executeUpdate();
             }
+
+            @Override
+            public Object mapRow(ResultSet rs) throws SQLException {
+                return null;
+            }
         };
         jdbcTemplate.update(sql);
     }
@@ -50,9 +56,10 @@ public class UserDao {
     //모든 회원 반환
     public List<User> findAll() throws SQLException {
         String sql = "SELECT * FROM USERS";
-        SelectJdbcTemplate selectJdbcTemplate = new SelectJdbcTemplate() {
+
+        JdbcTemplate jdbcTemplate = new JdbcTemplate() {
             @Override
-            public void setValues(PreparedStatement pstmt) {
+            public void setValues(PreparedStatement pstmt) throws SQLException {
 
             }
 
@@ -66,13 +73,13 @@ public class UserDao {
                 return user;
             }
         };
-        return selectJdbcTemplate.query(sql);
+        return jdbcTemplate.query(sql);
     }
 
     //userId로 회원 찾기
     public User findByUserId(String userId) throws SQLException {
         String sql = "SELECT userId, password, name, email FROM USERS WHERE userid=?";
-        SelectJdbcTemplate selectJdbcTemplate = new SelectJdbcTemplate() {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate() {
             @Override
             public void setValues(PreparedStatement pstmt) throws SQLException {
                 pstmt.setString(1, userId);
@@ -88,6 +95,6 @@ public class UserDao {
                 return user;
             }
         };
-        return (User) selectJdbcTemplate.queryForObject(sql);
+        return (User) jdbcTemplate.queryForObject(sql);
     }
 }
