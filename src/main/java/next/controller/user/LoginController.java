@@ -8,25 +8,27 @@ import core.mvc.Controller;
 import next.controller.UserSessionUtils;
 import next.dao.UserDao;
 import next.model.User;
+import next.view.JspView;
+import next.view.View;
 
 public class LoginController implements Controller {
     @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public View execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         String userId = req.getParameter("userId");
         String password = req.getParameter("password");
         UserDao userDao = new UserDao();
         User user = userDao.findByUserId(userId);
         if (user == null) {
             req.setAttribute("loginFailed", true);
-            return "/user/login.jsp";
+            return new JspView("/user/login.jsp");
         }
         if (user.matchPassword(password)) {
             HttpSession session = req.getSession();
             session.setAttribute(UserSessionUtils.USER_SESSION_KEY, user);
-            return "redirect:/";
+            return new JspView("redirect:/");
         } else {
             req.setAttribute("loginFailed", true);
-            return "/user/login.jsp";
+            return new JspView("/user/login.jsp");
         }
     }
 }
