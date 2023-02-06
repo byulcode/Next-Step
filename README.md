@@ -17,5 +17,17 @@
 - `service()` 메소드는 반환받은 `ModelAndView`의 모델 데이터를 뷰의 `render()` 메소드에 전달한다. 위 요청에서 뷰는 `JspView`다.
 - `JspView`는 전달받은 모델 데이터를 “home.jsp”에 전달해 HTML을 생성하고, 응답함으로써 작업을 끝낸다.
 
+#### 3. 질문하기 기능 구현
++ QuestionDao 클래스의 insert() 메소드를 활용하여 해결했다.
+
+#### 4. 로그인한 사용자만 질문 가능하도록 구현
++ UserSessionUtils 클래스를 활용해 구현했다.
+
+#### 5. 답변 목록 동적으로 출력하기
++ show.jsp의 답변 목록 부분을 JSTL로 구현했다.
+
+#### 6. 한글 인코딩 문제 해결
++ CharacterEncodingFilter 상단에  @WebFilter("/*") 설정을 추가해준다.
+
 #### 7. next.web.qna package의 ShowController는 멀티 쓰레드 상황에서 문제가 발생하는 이유에 대해 설명하라.
 * 
