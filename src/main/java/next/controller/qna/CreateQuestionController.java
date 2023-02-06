@@ -2,10 +2,8 @@ package next.controller.qna;
 
 import core.mvc.AbstractController;
 import core.mvc.ModelAndView;
-import core.web.filter.ResourceFilter;
 import next.controller.UserSessionUtils;
 import next.dao.QuestionDao;
-import next.dao.UserDao;
 import next.model.Question;
 import next.model.User;
 import org.slf4j.Logger;
