@@ -3,6 +3,7 @@ package next.controller.qna;
 import core.mvc.AbstractController;
 import core.mvc.ModelAndView;
 import core.web.filter.ResourceFilter;
+import next.controller.UserSessionUtils;
 import next.dao.QuestionDao;
 import next.dao.UserDao;
 import next.model.Question;
@@ -19,7 +20,13 @@ public class CreateQuestionController extends AbstractController {
 
     @Override
     public ModelAndView execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        Question question = new Question(request.getParameter("writer"), request.getParameter("title"), request.getParameter("contents"));
+        if (!UserSessionUtils.isLogined(request.getSession())) {
+            return jspView("redirect:/users/loginForm");
+        }
+        User user = UserSessionUtils.getUserFromSession(request.getSession());
+        logger.debug("User : {}", user);
+
+        Question question = new Question(user.getUserId(), request.getParameter("title"), request.getParameter("contents"));
         logger.debug("Question : {}", question);
         questionDao.insert(question);
         return jspView("redirect:/");
