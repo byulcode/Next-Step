@@ -38,3 +38,6 @@
 
 #### 8. 답변 추가시 countOfAnswer의 수를 하나 증가시켜라.
 + QuestionDao에 countOfAnswer의 수를 증가시키는 로직을 추가해서 해결했다.
+
+#### 9. JSON 데이터로 조회할 수 있도록 API 추가
++ /api/qna/list URL로 접근했을 때 질문 목록을 JSON 데이터로 조회할 수 있도록 구현했다.
