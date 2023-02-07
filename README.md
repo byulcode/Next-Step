@@ -35,3 +35,6 @@
 * 그래서 만약 첫 번째 스레드가 1번 문제를 요청했는데, 두번째 스레드가 execute() 메소드를 요청하면 ShowController가 2번 질문과 답변을 가리키게 된다. 그래서 첫 번째 글에 대한 응답이 1번이 아닌 2번 질문과 답변이 된다.
 * Question과 List<Answer>을 execute() 메소드의 로컬변수로 변경해서 문제를 해결했다.
 * 멀티스레드가 참조하는 ShowController 인스턴스는 동일하지만, 힙 메모리에 생성되어 있는 Question과 List<Answer>은 서로 다른 인스턴스를 참조하고 있다.
+
+#### 8. 답변 추가시 countOfAnswer의 수를 하나 증가시켜라.
++ QuestionDao에 countOfAnswer의 수를 증가시키는 로직을 추가해서 해결했다.
