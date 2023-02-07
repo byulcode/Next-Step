@@ -30,4 +30,8 @@
 + CharacterEncodingFilter 상단에  @WebFilter("/*") 설정을 추가해준다.
 
 #### 7. next.web.qna package의 ShowController는 멀티 쓰레드 상황에서 문제가 발생하는 이유에 대해 설명하라.
-* 
+* Question과 Answer은 클라이언트마다 다른 상태값을 가진다. 그래서 매 요청마다 새로운 인스턴스를 생성해야 한다.
+* ShowController는 Question과 List<Answer>을 필드값으로 설정하고 있어 힙 메모리에 저장되어 있는 Question과 List<Answer> 인스턴스를 가리키는 구조로 실행된다.
+* 그래서 만약 첫 번째 스레드가 1번 문제를 요청했는데, 두번째 스레드가 execute() 메소드를 요청하면 ShowController가 2번 질문과 답변을 가리키게 된다. 그래서 첫 번째 글에 대한 응답이 1번이 아닌 2번 질문과 답변이 된다.
+* Question과 List<Answer>을 execute() 메소드의 로컬변수로 변경해서 문제를 해결했다.
+* 멀티스레드가 참조하는 ShowController 인스턴스는 동일하지만, 힙 메모리에 생성되어 있는 Question과 List<Answer>은 서로 다른 인스턴스를 참조하고 있다.
