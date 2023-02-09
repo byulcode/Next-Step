@@ -29,6 +29,7 @@ public class Question {
         this.countOfComment = countOfComment;
     }
 
+
     public long getQuestionId() {
         return questionId;
     }
@@ -55,6 +56,15 @@ public class Question {
 
     public int getCountOfComment() {
         return countOfComment;
+    }
+
+    public boolean isSameUser(User user) {//User의 isSameUser 호출
+        return user.isSameUser(this.writer);
+    }
+
+    public void update(Question newQuestion) {
+        this.title = newQuestion.title;
+        this.contents = newQuestion.contents;
     }
 
     @Override
