@@ -8,6 +8,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcTemplate {
+
+    // static 영역에 객체를 딱 1개만 생성해둔다.
+    private static JdbcTemplate jdbcTemplate = new JdbcTemplate();
+
+    // private으로 생성자를 막아두었다. (외부에서 new로 생성 불가능)
+    private JdbcTemplate() {}
+
+    // 객체 인스턴스가 필요하면 이 getInstance() 메서드를 통해서만 조회하도록 허용한다.
+    public static JdbcTemplate getInstance() {
+        return jdbcTemplate;
+    }
+
     public void update(String sql, PreparedStatementSetter pss) throws DataAccessException {
         try (Connection conn = ConnectionManager.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
