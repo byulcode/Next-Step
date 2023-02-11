@@ -13,6 +13,8 @@ import next.model.Question;
 
 public class QuestionDaoTest {
     private static final Logger log = LoggerFactory.getLogger(QuestionDaoTest.class);
+
+    private QuestionDao questionDao = QuestionDao.getInstance();
     
     @Before
     public void setup() {
@@ -24,7 +26,6 @@ public class QuestionDaoTest {
     @Test
     public void crud() {
         Question question = new Question("writer", "title", "contents");
-        QuestionDao questionDao = new QuestionDao();
         Question savedQuestion = questionDao.insert(question);
         log.debug("question : {}", savedQuestion);
     }

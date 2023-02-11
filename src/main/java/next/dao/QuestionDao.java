@@ -15,6 +15,14 @@ import next.model.Question;
 
 public class QuestionDao {
 
+    private static QuestionDao questionDao = new QuestionDao();
+
+    private QuestionDao(){}
+
+    public static QuestionDao getInstance() {
+        return questionDao;
+    }
+
     private JdbcTemplate jdbcTemplate = JdbcTemplate.getInstance();
 
     public Question insert(Question question) {

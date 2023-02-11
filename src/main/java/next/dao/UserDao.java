@@ -10,7 +10,16 @@ import core.jdbc.RowMapper;
 
 public class UserDao {
 
+    private static UserDao userDao = new UserDao();
+
+    private UserDao() {}
+
+    public static UserDao getInstance() {
+        return userDao;
+    }
+
     JdbcTemplate jdbcTemplate = JdbcTemplate.getInstance();
+
     public void insert(User user) {
         String sql = "INSERT INTO USERS VALUES (?, ?, ?, ?)";
         jdbcTemplate.update(sql, user.getUserId(), user.getPassword(), user.getName(), user.getEmail());

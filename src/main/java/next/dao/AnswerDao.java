@@ -15,6 +15,15 @@ import core.jdbc.RowMapper;
 
 public class AnswerDao {
 
+    private static AnswerDao answerDao = new AnswerDao();
+
+    private AnswerDao() {
+    }
+
+    public static AnswerDao getInstance() {
+        return answerDao;
+    }
+
     private JdbcTemplate jdbcTemplate = JdbcTemplate.getInstance();
 
     public Answer insert(Answer answer) {

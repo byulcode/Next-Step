@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public class UpdateQuestionController extends AbstractController {
 
-    private QuestionDao questionDao = new QuestionDao();
+    private QuestionDao questionDao = QuestionDao.getInstance();
     private static final Logger log = LoggerFactory.getLogger(UpdateQuestionController.class);
 
     @Override
