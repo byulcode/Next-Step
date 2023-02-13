@@ -1,5 +1,6 @@
 package core.ref;
 
+import core.mvc.Controller;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import next.model.Question;
 import next.model.User;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.logging.StreamHandler;
 
@@ -24,9 +27,14 @@ public class ReflectionTest {
     }
 
     @Test
-    public void newInstanceWithConstructorArgs() {
+    public void newInstanceWithConstructorArgs() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         Class<User> clazz = User.class;
         logger.debug(clazz.getName());
+
+        Constructor constructor = clazz.getConstructor(new Class[]{String.class, String.class, String.class, String.class});
+
+        User user = (User) constructor.newInstance("byulId", "byulPwd", "byul", "byul@email.com");
+        logger.debug("User : {}", user);
     }
 
     @Test
