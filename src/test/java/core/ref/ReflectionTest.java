@@ -1,17 +1,17 @@
 package core.ref;
 
-import core.mvc.Controller;
+import next.model.Question;
+import next.model.User;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import next.model.Question;
-import next.model.User;
-
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.logging.StreamHandler;
+
+import static org.assertj.core.api.Assertions.*;
 
 public class ReflectionTest {
     private static final Logger logger = LoggerFactory.getLogger(ReflectionTest.class);
@@ -38,8 +38,18 @@ public class ReflectionTest {
     }
 
     @Test
-    public void privateFieldAccess() {
+    public void privateFieldAccess() throws NoSuchFieldException, IllegalAccessException {
         Class<Student> clazz = Student.class;
-        logger.debug(clazz.getName());
+        Student student = new Student();
+        Field field = clazz.getDeclaredField("name");
+        field.setAccessible(true);
+
+        assertThat(field.get(student)).isNull();
+        assertThat(student.getName()).isNull();
+
+        field.set(student, "별이");
+
+        assertThat(field.get(student)).isEqualTo("별이");
+        assertThat(student.getName()).isEqualTo("별이");
     }
 }
